@@ -883,7 +883,8 @@ onAuthStateChanged(auth,user=>{
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app-screen').style.display='block';
     document.getElementById('add-data').value=getHoje();
-    document.getElementById('na-data-val').value=getHoje();
+    const naData=document.getElementById('na-data-val');
+if(naData)naData.value=getHoje();
     initDB();verificarPenalizacoes();verificarStreakDiario();atualizarFAB('dashboard');
     if(Notification.permission==='granted')document.getElementById('btn-notif').textContent='🔕';
   }else{
