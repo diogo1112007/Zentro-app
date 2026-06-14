@@ -130,7 +130,7 @@ body{min-height:100dvh;padding-bottom:var(--nav-h);overflow-x:hidden;}
 
 /* ══ HORÁRIO NOVO ══ */
 .horario-wrap{overflow-x:auto;border-radius:var(--r-md);}
-.horario-table{width:100%;border-collapse:separate;border-spacing:2px;min-width:460px;}
+.horario-table{width:100%;border-collapse:separate;border-spacing:2px;min-width:620px;}
 .horario-table th{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:.5rem .3rem;text-align:center;}
 .horario-table td{height:48px;border-radius:8px;text-align:center;font-size:.7rem;font-weight:600;vertical-align:middle;cursor:pointer;transition:filter .15s,transform .15s;position:relative;border:1px solid var(--border);}
 .horario-table td:hover{filter:brightness(.92);transform:scale(1.03);}
@@ -845,7 +845,7 @@ let aulaEmEdicao=null; // {dia, hora, id}
 
 /* Cores por dia do horário guardadas em localStorage */
 const DIA_CORES_KEY=()=>`dia_cores_${uid}`;
-let diaCores={Seg:'',Ter:'',Qua:'',Qui:'',Sex:''};
+let diaCores={Seg:'',Ter:'',Qua:'',Qui:'',Sex:'',Sab:'',Dom:''};
 function carregarDiaCores(){try{const s=localStorage.getItem(DIA_CORES_KEY());if(s)diaCores={...diaCores,...JSON.parse(s)};}catch(e){}}
 function guardarDiaCores(){localStorage.setItem(DIA_CORES_KEY(),JSON.stringify(diaCores));}
 
@@ -1138,7 +1138,7 @@ function renderNotasAcademicas(){
 }
 
 /* ══ HORÁRIO SEMANAL NOVO ══ */
-const DIAS_HOR=['Seg','Ter','Qua','Qui','Sex'];
+const DIAS_HOR=['Seg','Ter','Qua','Qui','Sex','Sab','Dom'];
 const HORAS_HOR=['08:00','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','14:00','15:00','16:00','17:00','18:00','18:30','19:00','20:00'];
 
 function renderDiaCores(){
