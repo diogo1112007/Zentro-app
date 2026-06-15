@@ -1308,10 +1308,20 @@ function renderHorario(){
   if(!ht)return;
   const legendMap={};
 
-  // 1. Cabeçalhos com a cor de fundo também
+  // Conversor infalível e à prova de erros
+  const hexToRgba = (hex, alpha) => {
+    if(!hex || typeof hex !== 'string' || !hex.startsWith('#')) return 'transparent';
+    if(hex.length === 4) hex = '#' + hex[1]+hex[1] + hex[2]+hex[2] + hex[3]+hex[3];
+    let r = parseInt(hex.slice(1, 3), 16) || 0,
+        g = parseInt(hex.slice(3, 5), 16) || 0,
+        b = parseInt(hex.slice(5, 7), 16) || 0;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
+  // Cabeçalhos - Usamos "background" em vez de "background-color" e forçamos com !important
   let html=`<tr><th style="width:52px;">Hora</th>${DIAS_HOR.map(dia=>{
     const bgDia=diaCores[dia]||'';
-    const bgStyle=bgDia?`background:${bgDia}33; border-radius:8px;`:'';
+    const bgStyle=bgDia?`background: ${hexToRgba(bgDia, 0.35)} !important; border-radius:8px;`:'';
     return`<th style="${bgStyle}"><div class="dia-header-col"><span class="dia-header-nome">${dia}</span></div></th>`;
   }).join('')}</tr>`;
 
@@ -1323,13 +1333,13 @@ function renderHorario(){
       if(a){
         const corAula=a.cor||'#2563eb';
         legendMap[a.materia]=corAula;
-        html+=`<td class="horario-cell-aula" style="background:${corAula};" onclick="abrirModalAula('${dia}','${h}','${a.id}','${DOMPurify.sanitize(a.materia).replace(/'/g,"\\'")}','${(a.sala||'').replace(/'/g,"\\'")}','${a.cor||'#2563eb'}')">
+        html+=`<td class="horario-cell-aula" style="background: ${corAula} !important;" onclick="abrirModalAula('${dia}','${h}','${a.id}','${DOMPurify.sanitize(a.materia).replace(/'/g,"\\'")}','${(a.sala||'').replace(/'/g,"\\'")}','${a.cor||'#2563eb'}')">
           <div class="aula-nome">${DOMPurify.sanitize(a.materia)}</div>
           ${a.sala?`<div class="aula-sala">${DOMPurify.sanitize(a.sala)}</div>`:''}
         </td>`;
       } else {
-        // 2. Aumentada a opacidade de 18 para 33 (mais visível no tema escuro)
-        const bgStyle=bgDia?`background:${bgDia}33;`:'';
+        // Células Vazias - O !important obriga o browser a pintar a cor por cima do branco
+        const bgStyle=bgDia?`background: ${hexToRgba(bgDia, 0.25)} !important;`:'';
         html+=`<td class="horario-cell-empty" style="${bgStyle}" onclick="abrirModalAula('${dia}','${h}','','','','#2563eb')">+</td>`;
       }
     });
