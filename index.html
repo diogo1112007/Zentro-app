@@ -1307,7 +1307,14 @@ function renderHorario(){
   const ht=document.getElementById('horario-container');
   if(!ht)return;
   const legendMap={};
-  let html=`<tr><th style="width:52px;">Hora</th>${DIAS_HOR.map(dia=>{const bgDia=diaCores[dia]||'';return`<th><div class="dia-header-col"><span class="dia-header-nome">${dia}</span></div></th>`;}).join('')}</tr>`;
+
+  // 1. Cabeçalhos com a cor de fundo também
+  let html=`<tr><th style="width:52px;">Hora</th>${DIAS_HOR.map(dia=>{
+    const bgDia=diaCores[dia]||'';
+    const bgStyle=bgDia?`background:${bgDia}33; border-radius:8px;`:'';
+    return`<th style="${bgStyle}"><div class="dia-header-col"><span class="dia-header-nome">${dia}</span></div></th>`;
+  }).join('')}</tr>`;
+
   HORAS_HOR.forEach(h=>{
     html+=`<tr><td class="hora-label">${h}</td>`;
     DIAS_HOR.forEach(dia=>{
@@ -1321,7 +1328,8 @@ function renderHorario(){
           ${a.sala?`<div class="aula-sala">${DOMPurify.sanitize(a.sala)}</div>`:''}
         </td>`;
       } else {
-        const bgStyle=bgDia?`background:${bgDia}18;`:'';
+        // 2. Aumentada a opacidade de 18 para 33 (mais visível no tema escuro)
+        const bgStyle=bgDia?`background:${bgDia}33;`:'';
         html+=`<td class="horario-cell-empty" style="${bgStyle}" onclick="abrirModalAula('${dia}','${h}','','','','#2563eb')">+</td>`;
       }
     });
