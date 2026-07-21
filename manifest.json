@@ -1,0 +1,17 @@
+{
+  "name": "Foco — A tua vida organizada",
+  "short_name": "Foco",
+  "description": "Gestão de tarefas, hábitos e finanças.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#f5f4f0",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "icone.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
