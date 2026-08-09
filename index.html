@@ -2495,88 +2495,6 @@ function renderFlashcards(){
   if(document.getElementById('view-flashcards')?.classList.contains('active'))renderStudyArea();
 }
 
-/* ══ RENDER PRINCIPAL ══ */
-/* ══ RENDER PRINCIPAL ══ */
-/* ══ IOU ══ */
-const colIOU=col("iou");
-let iouList=[];
-const colSubscricoes=col("subscricoes");
-let subscricoes=[];
-const colMealheiros=col("mealheiros");
-let mealheiros=[];
-let mealheiroEmDeposito=null;
-
-document.getElementById('btn-salvar-iou').onclick=async()=>{
-  const descricao=DOMPurify.sanitize(document.getElementById('iou-descricao').value.trim());
-  const valor=parseFloat(document.getElementById('iou-valor').value);
-  const tipo=document.getElementById('iou-tipo').value;
-  const pessoa=DOMPurify.sanitize(document.getElementById('iou-pessoa').value.trim());
-  const data=document.getElementById('iou-data').value||getHoje();
-  const notas=DOMPurify.sanitize(document.getElementById('iou-notas').value.trim());
-  if(!descricao||!valor||valor<=0||!pessoa)return toast("Preenche todos os campos!","error");
-  await addDoc(colIOU,{descricao,valor,tipo,pessoa,data,notas,liquidado:false,uid,ts:Date.now()});
-  fecharModal('modal-add-iou');
-  ['iou-descricao','iou-valor','iou-pessoa','iou-notas'].forEach(id=>document.getElementById(id).value='');
-  toast("Despesa registada! 🤝");
-};
-
-window.liquidarIOU=async(id)=>{
-  if(await pedirConfirmacao('Marcar esta dívida como liquidada?','Liquidar?')){
-    await updateDoc(doc(db,"iou",id),{liquidado:true});
-    somDing();toast("✅ Dívida liquidada!");
-  }
-};
-
-document.getElementById('btn-salvar-subscricao').onclick=async()=>{
-  const nome=DOMPurify.sanitize(document.getElementById('sub-nome').value.trim());
-  const emoji=document.getElementById('sub-emoji').value.trim()||'🔄';
-  const valor=parseFloat(document.getElementById('sub-valor').value);
-  const dia=parseInt(document.getElementById('sub-dia').value)||1;
-  const periodicidade=document.getElementById('sub-periodicidade').value;
-  const categoria=document.getElementById('sub-categoria').value;
-  if(!nome||!valor||valor<=0)return toast("Preenche o nome e o valor!","error");
-  await addDoc(colSubscricoes,{nome,emoji,valor,dia,periodicidade,categoria,uid,ts:Date.now()});
-  fecharModal('modal-add-subscricao');
-  ['sub-nome','sub-emoji','sub-valor','sub-dia'].forEach(id=>document.getElementById(id).value='');
-  toast("Subscrição adicionada! 🔄");
-};
-
-document.getElementById('btn-salvar-mealheiro').onclick=async()=>{
-  const nome=DOMPurify.sanitize(document.getElementById('mealheiro-nome').value.trim());
-  const emoji=document.getElementById('mealheiro-emoji').value.trim()||'🐷';
-  const meta=parseFloat(document.getElementById('mealheiro-meta').value);
-  const atual=parseFloat(document.getElementById('mealheiro-atual').value)||0;
-  const data=document.getElementById('mealheiro-data').value;
-  if(!nome||!meta||meta<=0)return toast("Preenche o nome e a meta!","error");
-  await addDoc(colMealheiros,{nome,emoji,meta,atual,data,uid,ts:Date.now()});
-  fecharModal('modal-add-mealheiro');
-  ['mealheiro-nome','mealheiro-emoji','mealheiro-meta','mealheiro-data'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('mealheiro-atual').value='0';
-  toast("Mealheiro criado! 🐷");
-};
-
-window.abrirDeposito=(m)=>{
-  mealheiroEmDeposito=m;
-  document.getElementById('modal-depositar-title').textContent=`💰 ${m.nome}`;
-  document.getElementById('modal-depositar-emoji').textContent=m.emoji||'🐷';
-  const pct=Math.min(100,Math.round(m.atual/m.meta*100));
-  document.getElementById('modal-depositar-info').textContent=`${fmtMoney(m.atual)} de ${fmtMoney(m.meta)} (${pct}%)`;
-  document.getElementById('modal-depositar-bar').style.width=pct+'%';
-  document.getElementById('depositar-valor').value='';
-  abrirModal('modal-depositar-mealheiro');
-};
-
-document.getElementById('btn-confirmar-deposito').onclick=async()=>{
-  if(!mealheiroEmDeposito)return;
-  const val=parseFloat(document.getElementById('depositar-valor').value);
-  if(!val||val<=0)return toast("Valor inválido","error");
-  const novoAtual=Math.min(mealheiroEmDeposito.meta,mealheiroEmDeposito.atual+val);
-  await updateDoc(doc(db,"mealheiros",mealheiroEmDeposito.id),{atual:novoAtual});
-  if(novoAtual>=mealheiroEmDeposito.meta){confetti({particleCount:200,spread:90});toast(`🎉 Meta atingida!`);}
-  else toast(`+${fmtMoney(val)} depositado! 💰`);
-  fecharModal('modal-depositar-mealheiro');
-};
-
 function renderizarApp(){
   try{
     const hoje=getHoje();
@@ -2619,10 +2537,3 @@ function initDB(){
   unsubs.push(onSnapshot(query(colIOU,where("uid","==",uid)),s=>{iouList=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);agendarRender();}));
 unsubs.push(onSnapshot(query(colSubscricoes,where("uid","==",uid)),s=>{subscricoes=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);agendarRender();}));
 unsubs.push(onSnapshot(query(colMealheiros,where("uid","==",uid)),s=>{mealheiros=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);agendarRender();}));
-unsubs.push(onSnapshot(query(colMealheiros,where("uid","==",uid)),s=>{mealheiros=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);agendarRender();}));
-  unsubs.push(onSnapshot(query(colIOU,where("uid","==",uid)),s=>{iouList=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);agendarRender();}));
-  unsubs.push(onSnapshot(query(colSubscricoes,where("uid","==",uid)),s=>{subscricoes=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);agendarNotificacoesSubscricoes();agendarRender();}));
-unsubs.push(onSnapshot(query(colMealheiros,where("uid","==",uid)),s=>{mealheiros=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);agendarRender();}));}
-</script>
-</body>
-</html>
