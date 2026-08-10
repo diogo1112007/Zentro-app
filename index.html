@@ -384,6 +384,56 @@ select{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/
 .pin-key:active{transform:scale(.93);}
 .pin-error{color:var(--danger);font-size:.8rem;text-align:center;animation:shake .4s;}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+/* IOU */
+.iou-card{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;background:var(--surface2);border-radius:var(--r-md);margin-bottom:.5rem;border-left:3px solid var(--border2);transition:transform .18s var(--ease-bounce),box-shadow .15s;}
+.iou-card:hover{transform:translateX(3px);box-shadow:var(--shadow);}
+.iou-card.a-receber{border-left-color:var(--success);}
+.iou-card.a-pagar{border-left-color:var(--danger);}
+.iou-card.liquidado{opacity:.45;}
+.iou-card.liquidado .iou-desc{text-decoration:line-through;}
+.iou-info{flex:1;min-width:0;}
+.iou-desc{font-size:.88rem;font-weight:700;}
+.iou-detalhe{font-size:.72rem;color:var(--muted);margin-top:2px;}
+.iou-valor{font-size:1rem;font-weight:800;font-family:var(--mono);flex-shrink:0;}
+.iou-valor.a-receber{color:var(--success);}
+.iou-valor.a-pagar{color:var(--danger);}
+.iou-resumo-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem .75rem;border-radius:var(--r-md);margin-bottom:.3rem;}
+.iou-resumo-row.positivo{background:var(--success-bg);color:var(--success);}
+.iou-resumo-row.negativo{background:var(--danger-bg);color:var(--danger);}
+.iou-resumo-label{font-size:.8rem;font-weight:600;}
+.iou-resumo-val{font-size:.9rem;font-weight:800;font-family:var(--mono);}
+.liquidar-btn{padding:.35rem .7rem;border-radius:var(--r-sm);background:var(--success-bg);color:var(--success);border:1px solid var(--success);font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .15s,color .15s;}
+.liquidar-btn:hover{background:var(--success);color:white;}
+/* Subscrições */
+.sub-card{display:flex;align-items:center;gap:.75rem;padding:.8rem 1rem;background:var(--surface2);border-radius:var(--r-md);margin-bottom:.5rem;transition:transform .18s var(--ease-bounce),box-shadow .15s;}
+.sub-card:hover{transform:translateX(3px);box-shadow:var(--shadow);}
+.sub-emoji{font-size:1.3rem;flex-shrink:0;}
+.sub-info{flex:1;min-width:0;}
+.sub-nome{font-size:.88rem;font-weight:700;}
+.sub-detalhe{font-size:.72rem;color:var(--muted);margin-top:1px;}
+.sub-valor{font-size:.95rem;font-weight:800;font-family:var(--mono);color:var(--danger);flex-shrink:0;}
+.sub-alerta{font-size:.68rem;background:var(--warn-bg);color:var(--warn);padding:.15rem .45rem;border-radius:99px;font-weight:700;margin-top:.25rem;display:inline-block;}
+.sub-alerta.urgente{background:var(--danger-bg);color:var(--danger);}
+/* Mealheiros */
+.mealheiro-card{background:var(--surface2);border-radius:var(--r-md);padding:.9rem 1rem;margin-bottom:.6rem;transition:transform .18s var(--ease-bounce),box-shadow .15s;}
+.mealheiro-card:hover{transform:translateX(3px);box-shadow:var(--shadow);}
+.mealheiro-header{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;}
+.mealheiro-emoji{font-size:1.4rem;flex-shrink:0;}
+.mealheiro-info{flex:1;}
+.mealheiro-nome{font-size:.9rem;font-weight:700;}
+.mealheiro-vals{font-size:.75rem;color:var(--muted);margin-top:1px;}
+.mealheiro-meta-val{font-size:.85rem;font-weight:700;font-family:var(--mono);color:var(--success);}
+.mealheiro-prazo{font-size:.7rem;color:var(--muted);margin-top:.3rem;}
+.mealheiro-prazo.urgente{color:var(--danger);font-weight:700;}
+.mealheiro-mensal{font-size:.72rem;background:var(--accent-bg);color:var(--accent);padding:.2rem .5rem;border-radius:99px;font-weight:700;margin-top:.3rem;display:inline-block;}
+
+.pomo-fc-card{border-radius:var(--r-lg);min-height:160px;display:flex;align-items:center;justify-content:center;padding:1.5rem;text-align:center;font-size:1rem;font-weight:600;line-height:1.5;cursor:pointer;transition:transform .3s var(--ease-bounce);position:relative;}
+.pomo-fc-card:hover{transform:scale(1.02);}
+.pomo-fc-front{background:var(--accent);color:white;}
+.pomo-fc-back{background:var(--success-bg);color:var(--success);border:2px solid var(--success);}
+.pomo-fc-hint{position:absolute;bottom:.6rem;font-size:.68rem;opacity:.7;font-weight:400;}
+.pomo-timer-ring{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:.4rem;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 </style>
 </head>
 <body>
@@ -451,6 +501,60 @@ select{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/
   </div>
 </div>
 
+<!-- MODAL POMO + FLASHCARDS -->
+<div class="modal-overlay" id="modal-pomo-estudo" role="dialog" aria-modal="true">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title">📚 Foco + Estudo</div>
+      <button class="modal-close" onclick="fecharModoEstudo()">✕</button>
+    </div>
+    <!-- Timer mini -->
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:var(--r-md);padding:.75rem 1rem;">
+      <div>
+        <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;" id="pomo-estudo-mode">Foco</div>
+        <div style="font-size:1.8rem;font-weight:800;font-family:var(--mono);letter-spacing:-.03em;" id="pomo-estudo-time">25:00</div>
+      </div>
+      <div style="display:flex;gap:.4rem;">
+        <button class="btn-primary" style="padding:.5rem .9rem;font-size:.82rem;" id="btn-pomo-estudo-toggle">▶ Iniciar</button>
+        <button class="btn-secondary" style="padding:.5rem .8rem;font-size:.82rem;" onclick="resetPomoEstudo()">↺</button>
+      </div>
+    </div>
+    <!-- Flashcard área -->
+    <div id="pomo-fc-area">
+      <div class="empty-state">Sem flashcards para rever. Adiciona cartões primeiro!</div>
+    </div>
+    <!-- Botões SR — aparecem após virar -->
+    <div id="pomo-sr-btns" class="sr-btns" style="display:none;">
+      <button class="sr-btn sr-hard" onclick="responderSREstudo('dificil')">😓 Difícil</button>
+      <button class="sr-btn sr-medium" onclick="responderSREstudo('medio')">🤔 Médio</button>
+      <button class="sr-btn sr-easy" onclick="responderSREstudo('facil')">😊 Fácil</button>
+    </div>
+    <div style="font-size:.75rem;color:var(--muted);text-align:center;" id="pomo-fc-counter"></div>
+  </div>
+</div>
+
+<!-- MODAL ESCOLHA INÍCIO POMO -->
+<div class="modal-overlay" id="modal-pomo-escolha" role="dialog" aria-modal="true">
+  <div class="modal-sheet" style="max-width:360px;">
+    <div class="modal-header">
+      <div class="modal-title">⏱ Iniciar Sessão</div>
+      <button class="modal-close" onclick="fecharModal('modal-pomo-escolha')">✕</button>
+    </div>
+    <div style="text-align:center;font-size:.9rem;color:var(--muted);margin-bottom:.5rem;">O que queres fazer nesta sessão?</div>
+    <div style="display:flex;flex-direction:column;gap:.6rem;">
+      <button class="btn-primary" onclick="iniciarModoEstudo()">
+        📚 Estudar Flashcards
+        <div style="font-size:.72rem;opacity:.8;font-weight:400;margin-top:.15rem;" id="pomo-fc-due-label"></div>
+      </button>
+      <button class="btn-secondary" onclick="fecharModal('modal-pomo-escolha');abrirModal('modal-pomodoro')">
+        🎯 Trabalhar numa Tarefa
+      </button>
+      <button class="btn-secondary" onclick="fecharModal('modal-pomo-escolha');abrirModal('modal-pomodoro')">
+        ⏱ Foco Livre (sem tarefa)
+      </button>
+    </div>
+  </div>
+</div>
 <!-- MODAL POMO TAREFA CONCLUÍDA -->
 <div class="modal-overlay" id="modal-pomo-done" role="dialog" aria-modal="true">
   <div class="modal-sheet" style="max-width:340px;">
@@ -629,6 +733,35 @@ select{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/
 
   <!-- FINANÇAS -->
   <section id="view-financas" class="view-section">
+    <!-- MEALHEIROS -->
+     <!-- IOU -->
+<div class="card" id="iou-card">
+  <div class="section-header">
+    <div class="section-title">🤝 Quem Deve a Quem</div>
+    <button class="btn-secondary" style="padding:.4rem .8rem;font-size:.78rem;" onclick="abrirModal('modal-add-iou')">+ Registar</button>
+  </div>
+  <div id="iou-resumo" style="display:none;margin-bottom:.75rem;"></div>
+  <div id="lista-iou"></div>
+</div>
+<!-- SUBSCRIÇÕES -->
+<div class="card" id="subscricoes-card">
+  <div class="section-header">
+    <div class="section-title">🔄 Subscrições & Custos Fixos</div>
+    <button class="btn-secondary" style="padding:.4rem .8rem;font-size:.78rem;" onclick="abrirModal('modal-add-subscricao')">+ Nova</button>
+  </div>
+  <div id="custo-fixo-total" style="display:none;background:var(--danger-bg);border-radius:var(--r-md);padding:.6rem 1rem;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;">
+    <span style="font-size:.82rem;font-weight:600;color:var(--danger);">💸 Custo fixo mensal</span>
+    <span style="font-size:1.1rem;font-weight:800;font-family:var(--mono);color:var(--danger);" id="custo-fixo-val">0,00€</span>
+  </div>
+  <div id="lista-subscricoes"></div>
+</div>
+    <div class="card" id="mealheiros-card">
+  <div class="section-header">
+    <div class="section-title">🐷 Mealheiros de Poupança</div>
+    <button class="btn-secondary" style="padding:.4rem .8rem;font-size:.78rem;" onclick="abrirModal('modal-add-mealheiro')">+ Novo</button>
+  </div>
+  <div id="lista-mealheiros"></div>
+</div>
     <div class="metrics-row">
       <div class="metric-card"><div class="metric-label">Ganhos</div><div class="metric-value green" id="dash-ganhos">0,00€</div></div>
       <div class="metric-card"><div class="metric-label">Gastos</div><div class="metric-value red" id="dash-gastos">0,00€</div></div>
@@ -932,6 +1065,143 @@ select{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/
   </div>
 </div>
 
+<!-- MODAL IOU -->
+<div class="modal-overlay" id="modal-add-iou" role="dialog" aria-modal="true">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title">🤝 Registar Despesa Partilhada</div>
+      <button class="modal-close" onclick="fecharModal('modal-add-iou')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="iou-descricao">Descrição</label>
+      <input type="text" id="iou-descricao" placeholder="Ex: Jantar, Bilhetes, Material…">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="iou-valor">Valor total (€)</label>
+      <input type="number" id="iou-valor" min="0.01" step="0.01" placeholder="Ex: 45.00">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="iou-tipo">Direção</label>
+      <select id="iou-tipo">
+        <option value="dei">💸 Eu paguei — alguém me deve</option>
+        <option value="recebi">🤲 Alguém pagou — eu devo</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="iou-pessoa">Nome da pessoa</label>
+      <input type="text" id="iou-pessoa" placeholder="Ex: João, Ana, Malta do curso…">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="iou-data">Data</label>
+      <input type="date" id="iou-data">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="iou-notas">Notas (opcional)</label>
+      <input type="text" id="iou-notas" placeholder="Ex: Split 50/50, só o João deve metade…">
+    </div>
+    <button class="btn-primary" id="btn-salvar-iou">Guardar</button>
+  </div>
+</div>
+<!-- MODAL SUBSCRIÇÃO -->
+<div class="modal-overlay" id="modal-add-subscricao" role="dialog" aria-modal="true">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title">🔄 Nova Subscrição</div>
+      <button class="modal-close" onclick="fecharModal('modal-add-subscricao')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="sub-nome">Nome</label>
+      <input type="text" id="sub-nome" placeholder="Ex: Netflix, Ginásio, Propinas…">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="sub-emoji">Ícone (emoji)</label>
+      <input type="text" id="sub-emoji" placeholder="🎬" maxlength="4">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="sub-valor">Valor (€)</label>
+        <input type="number" id="sub-valor" min="0.01" step="0.01" placeholder="Ex: 12.99">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="sub-dia">Dia de cobrança</label>
+        <input type="number" id="sub-dia" min="1" max="31" placeholder="Ex: 15">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="sub-periodicidade">Periodicidade</label>
+      <select id="sub-periodicidade">
+        <option value="mensal">📅 Mensal</option>
+        <option value="anual">📆 Anual</option>
+        <option value="semanal">🗓 Semanal</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="sub-categoria">Categoria</label>
+      <select id="sub-categoria">
+        <option value="entretenimento">🎬 Entretenimento</option>
+        <option value="saude">💪 Saúde & Ginásio</option>
+        <option value="educacao">📚 Educação</option>
+        <option value="tecnologia">💻 Tecnologia</option>
+        <option value="outros">📌 Outros</option>
+      </select>
+    </div>
+    <button class="btn-primary" id="btn-salvar-subscricao">Guardar Subscrição</button>
+  </div>
+</div>
+<!-- MODAL MEALHEIRO -->
+<div class="modal-overlay" id="modal-add-mealheiro" role="dialog" aria-modal="true">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title">🐷 Novo Mealheiro</div>
+      <button class="modal-close" onclick="fecharModal('modal-add-mealheiro')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="mealheiro-nome">Nome do objetivo</label>
+      <input type="text" id="mealheiro-nome" placeholder="Ex: Mota, Intercâmbio, Mestrado…">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="mealheiro-emoji">Ícone (emoji)</label>
+      <input type="text" id="mealheiro-emoji" placeholder="🏍️" maxlength="4">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="mealheiro-meta">Meta (€)</label>
+        <input type="number" id="mealheiro-meta" min="1" placeholder="Ex: 3000">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="mealheiro-atual">Poupado até agora (€)</label>
+        <input type="number" id="mealheiro-atual" min="0" placeholder="Ex: 250" value="0">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="mealheiro-data">Data limite</label>
+      <input type="date" id="mealheiro-data">
+    </div>
+    <button class="btn-primary" id="btn-salvar-mealheiro">Criar Mealheiro</button>
+  </div>
+</div>
+
+<!-- MODAL DEPOSITAR MEALHEIRO -->
+<div class="modal-overlay" id="modal-depositar-mealheiro" role="dialog" aria-modal="true">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-depositar-title">💰 Depositar</div>
+      <button class="modal-close" onclick="fecharModal('modal-depositar-mealheiro')">✕</button>
+    </div>
+    <div style="text-align:center;padding:.5rem 0;">
+      <div style="font-size:2rem;" id="modal-depositar-emoji"></div>
+      <div style="font-size:.85rem;color:var(--muted);margin-top:.3rem;" id="modal-depositar-info"></div>
+      <div class="progress-bar-track" style="height:8px;margin:.6rem 0;">
+        <div class="progress-bar-fill green" id="modal-depositar-bar" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="depositar-valor">Valor a depositar (€)</label>
+      <input type="number" id="depositar-valor" min="0.01" step="0.01" placeholder="Ex: 50">
+    </div>
+    <button class="btn-primary" id="btn-confirmar-deposito">Depositar 💰</button>
+  </div>
+</div>
 <!-- MODAL ORÇAMENTO -->
 <div class="modal-overlay" id="modal-add-budget" role="dialog" aria-modal="true">
   <div class="modal-sheet">
@@ -1137,6 +1407,7 @@ onAuthStateChanged(auth,user=>{
     document.getElementById('app-screen').style.display='block';
     document.getElementById('add-data').value=getHoje();
     const naData=document.getElementById('na-data-val');if(naData)naData.value=getHoje();
+    const iouData=document.getElementById('iou-data');if(iouData)iouData.value=getHoje();
     carregarDiaCores();carregarBudgets();
     initDB();verificarPenalizacoes();verificarStreakDiario();atualizarFAB('dashboard');
     registarRecorrentes();
@@ -1157,7 +1428,7 @@ document.getElementById('btn-backup-import').onclick=()=>document.getElementById
 document.getElementById('import-input').onchange=async e=>{const file=e.target.files[0];if(!file)return;const text=await file.text();try{const data=JSON.parse(text);if(!await pedirConfirmacao('Os dados serão adicionados à tua conta.','Importar backup?'))return;const batch=[];if(data.objetivos)data.objetivos.forEach(o=>{delete o.id;batch.push(addDoc(colObj,{...o,uid}));});if(data.eventos)data.eventos.forEach(o=>{delete o.id;batch.push(addDoc(colEv,{...o,uid}));});if(data.notas)data.notas.forEach(o=>{delete o.id;batch.push(addDoc(colNot,{...o,uid}));});if(data.financas)data.financas.forEach(o=>{delete o.id;batch.push(addDoc(colFin,{...o,uid}));});await Promise.all(batch);toast("Backup importado!");}catch(err){toast("Ficheiro inválido","error");}e.target.value='';};
 
 document.getElementById('fab-btn').onclick=()=>{(FAB_ACTION[viewAtual]||FAB_ACTION.dashboard)();};
-document.getElementById('btn-pomodoro').onclick=()=>abrirModal('modal-pomodoro');
+document.getElementById('btn-pomodoro').onclick=()=>abrirEscolhaPomo();
 
 /* Streak */
 function calcularStreakReal(){const diasComLog=new Set(habitosLog.map(l=>l.data));let count=0;const hoje=getHoje();const ontem=new Date();ontem.setDate(ontem.getDate()-1);const ontemStr=`${ontem.getFullYear()}-${String(ontem.getMonth()+1).padStart(2,'0')}-${String(ontem.getDate()).padStart(2,'0')}`;if(!diasComLog.has(hoje)&&!diasComLog.has(ontemStr))return 0;const cur=diasComLog.has(hoje)?new Date():ontem;while(true){const s=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;if(!diasComLog.has(s))break;count++;cur.setDate(cur.getDate()-1);}return count;}
@@ -1418,7 +1689,402 @@ document.getElementById('btn-guardar-financa').onclick=async()=>{
   document.getElementById('fin-valor').value='';document.getElementById('fin-descricao').value='';
   toast("Registado!");
 };
+/* Pomo Estudo */
+/* ══ POMODORO + FLASHCARDS INTEGRADOS ══ */
+let pomoEstudoRun=false,pomoEstudoTimer=null,pomoEstudoEndTs=null;
+let pomoEstudoDur=25*60,pomoEstudoTR=25*60;
+let pomoFcIndex=0,pomoFcFlipped=false;
+let pomoFcDueList=[];
 
+function abrirEscolhaPomo(){
+  const hoje=getHoje();
+  const due=flashcards.filter(f=>!f.srNextDate||f.srNextDate<=hoje);
+  const labelEl=document.getElementById('pomo-fc-due-label');
+  if(labelEl){
+    labelEl.textContent=due.length>0
+      ?`${due.length} cartão${due.length!==1?'s':''} para rever hoje`
+      :'Sem cartões para rever hoje';
+  }
+  abrirModal('modal-pomo-escolha');
+}
+
+function iniciarModoEstudo(){
+  fecharModal('modal-pomo-escolha');
+  const hoje=getHoje();
+  pomoFcDueList=flashcards.filter(f=>!f.srNextDate||f.srNextDate<=hoje);
+  if(!pomoFcDueList.length){
+    pomoFcDueList=[...flashcards];
+  }
+  pomoFcIndex=0;pomoFcFlipped=false;
+  pomoEstudoTR=pomoEstudoDur;
+  pomoEstudoRun=false;
+  pomoEstudoEndTs=null;
+  document.getElementById('btn-pomo-estudo-toggle').textContent='▶ Iniciar';
+  renderPomoFC();
+  updPomoEstudo();
+  abrirModal('modal-pomo-estudo');
+}
+
+window.fecharModoEstudo=()=>{
+  clearInterval(pomoEstudoTimer);
+  pomoEstudoRun=false;
+  pomoEstudoEndTs=null;
+  document.title='Foco — A tua vida organizada';
+  fecharModal('modal-pomo-estudo');
+};
+
+window.resetPomoEstudo=()=>{
+  clearInterval(pomoEstudoTimer);
+  pomoEstudoRun=false;pomoEstudoEndTs=null;
+  pomoEstudoTR=pomoEstudoDur;
+  document.getElementById('btn-pomo-estudo-toggle').textContent='▶ Iniciar';
+  updPomoEstudo();
+};
+
+function updPomoEstudo(){
+  const m=Math.floor(pomoEstudoTR/60).toString().padStart(2,'0');
+  const s=(pomoEstudoTR%60).toString().padStart(2,'0');
+  const timeEl=document.getElementById('pomo-estudo-time');
+  const modeEl=document.getElementById('pomo-estudo-mode');
+  if(timeEl)timeEl.textContent=`${m}:${s}`;
+  if(modeEl)modeEl.innerHTML=pomoEstudoRun
+    ?`<span class="pomo-timer-ring"></span>A correr`
+    :'Pausado';
+  if(pomoEstudoRun)document.title=`${m}:${s} 📚 Estudo`;
+  else document.title='Foco — A tua vida organizada';
+}
+
+document.getElementById('btn-pomo-estudo-toggle').onclick=()=>{
+  if(pomoEstudoRun){
+    clearInterval(pomoEstudoTimer);
+    pomoEstudoRun=false;pomoEstudoEndTs=null;
+    document.getElementById('btn-pomo-estudo-toggle').textContent='▶ Retomar';
+    updPomoEstudo();return;
+  }
+  pomoEstudoEndTs=Date.now()+pomoEstudoTR*1000;
+  pomoEstudoRun=true;
+  document.getElementById('btn-pomo-estudo-toggle').textContent='⏸ Pausar';
+  pomoEstudoTimer=setInterval(()=>{
+    pomoEstudoTR=Math.max(0,Math.round((pomoEstudoEndTs-Date.now())/1000));
+    updPomoEstudo();
+    if(pomoEstudoTR<=0){
+      clearInterval(pomoEstudoTimer);
+      pomoEstudoRun=false;pomoEstudoEndTs=null;
+      somDing();somDing();
+      enviarNotificacao('📚 Sessão de estudo terminada!','Boa sessão! Descansa um pouco.');
+      document.getElementById('btn-pomo-estudo-toggle').textContent='▶ Iniciar';
+      pomoEstudoTR=pomoEstudoDur;
+      updPomoEstudo();
+      toast('📚 Sessão terminada! Excelente trabalho!','success');
+    }
+  },500);
+};
+
+function renderPomoFC(){
+  const area=document.getElementById('pomo-fc-area');
+  const counter=document.getElementById('pomo-fc-counter');
+  const srBtns=document.getElementById('pomo-sr-btns');
+  if(!area)return;
+  if(!pomoFcDueList.length){
+    area.innerHTML='<div class="empty-state">🎉 Todos os cartões revistos!</div>';
+    if(srBtns)srBtns.style.display='none';
+    if(counter)counter.textContent='';
+    return;
+  }
+  const fc=pomoFcDueList[pomoFcIndex%pomoFcDueList.length];
+  if(counter)counter.textContent=`Cartão ${(pomoFcIndex%pomoFcDueList.length)+1} de ${pomoFcDueList.length} · ${DOMPurify.sanitize(fc.categoria||'Geral')}`;
+  if(srBtns)srBtns.style.display=pomoFcFlipped?'flex':'none';
+  area.innerHTML=`<div class="pomo-fc-card ${pomoFcFlipped?'pomo-fc-back':'pomo-fc-front'}"
+    onclick="virarPomoFC()">
+    ${pomoFcFlipped?DOMPurify.sanitize(fc.resposta):DOMPurify.sanitize(fc.pergunta)}
+    <span class="pomo-fc-hint">${pomoFcFlipped?'':'Toca para ver a resposta'}</span>
+  </div>`;
+}
+
+window.virarPomoFC=()=>{
+  pomoFcFlipped=!pomoFcFlipped;
+  renderPomoFC();
+};
+
+window.responderSREstudo=async(dificuldade)=>{
+  const fc=pomoFcDueList[pomoFcIndex%pomoFcDueList.length];
+  if(!fc)return;
+  let intervalo=1,ease=fc.srEase||2.5;
+  if(dificuldade==='facil'){intervalo=Math.round((fc.srInterval||1)*ease);ease=Math.min(3,ease+0.15);}
+  else if(dificuldade==='medio'){intervalo=Math.round((fc.srInterval||1)*Math.max(1.3,ease-0.15));ease=Math.max(1.3,ease-0.1);}
+  else{intervalo=1;ease=Math.max(1.3,ease-0.3);}
+  const next=new Date();next.setDate(next.getDate()+intervalo);
+  const nextStr=`${next.getFullYear()}-${String(next.getMonth()+1).padStart(2,'0')}-${String(next.getDate()).padStart(2,'0')}`;
+  await updateDoc(doc(db,"flashcards",fc.id),{srNextDate:nextStr,srInterval:intervalo,srEase:ease});
+  xpMensal+=dificuldade==='facil'?3:dificuldade==='medio'?2:1;salvarXP();
+  /* Remover da lista se fácil/médio */
+  if(dificuldade!=='dificil'){
+    pomoFcDueList.splice(pomoFcIndex%pomoFcDueList.length,1);
+  } else {
+    pomoFcIndex++;
+  }
+  pomoFcFlipped=false;
+  if(!pomoFcDueList.length){
+    toast('🎉 Todos os cartões revistos! +XP bónus');
+    xpMensal+=10;salvarXP();
+  } else {
+    toast(dificuldade==='facil'?`✅ Fácil — próx. em ${intervalo} dia${intervalo!==1?'s':''}`:`📅 Próx. em ${intervalo} dia${intervalo!==1?'s':''}`);
+  }
+  renderPomoFC();
+};
+/* ══ IOU — DIVISÃO DE DESPESAS ══ */
+const colIOU=col("iou");
+let iouList=[];
+
+document.getElementById('btn-salvar-iou').onclick=async()=>{
+  const descricao=DOMPurify.sanitize(document.getElementById('iou-descricao').value.trim());
+  const valor=parseFloat(document.getElementById('iou-valor').value);
+  const tipo=document.getElementById('iou-tipo').value;
+  const pessoa=DOMPurify.sanitize(document.getElementById('iou-pessoa').value.trim());
+  const data=document.getElementById('iou-data').value||getHoje();
+  const notas=DOMPurify.sanitize(document.getElementById('iou-notas').value.trim());
+  if(!descricao||!valor||valor<=0||!pessoa)return toast("Preenche todos os campos obrigatórios!","error");
+  await addDoc(colIOU,{descricao,valor,tipo,pessoa,data,notas,liquidado:false,uid,ts:Date.now()});
+  fecharModal('modal-add-iou');
+  ['iou-descricao','iou-valor','iou-pessoa','iou-notas'].forEach(id=>document.getElementById(id).value='');
+  toast("Despesa registada! 🤝");
+};
+
+window.liquidarIOU=async(id)=>{
+  if(await pedirConfirmacao('Marcar esta dívida como liquidada?','Liquidar dívida?')){
+    await updateDoc(doc(db,"iou",id),{liquidado:true});
+    somDing();
+    toast("✅ Dívida liquidada!");
+  }
+};
+
+function renderIOU(){
+  const el=document.getElementById('lista-iou');
+  const resumoEl=document.getElementById('iou-resumo');
+  if(!el)return;
+
+  if(!iouList.length){
+    el.innerHTML='<div class="empty-state">Sem dívidas registadas. Tudo limpo! 🎉</div>';
+    if(resumoEl)resumoEl.style.display='none';
+    return;
+  }
+
+  /* Resumo */
+  const pendentes=iouList.filter(i=>!i.liquidado);
+  const aReceber=pendentes.filter(i=>i.tipo==='dei').reduce((a,i)=>a+i.valor,0);
+  const aPagar=pendentes.filter(i=>i.tipo==='recebi').reduce((a,i)=>a+i.valor,0);
+  const saldoIOU=aReceber-aPagar;
+
+  if(resumoEl&&pendentes.length){
+    resumoEl.style.display='block';
+    resumoEl.innerHTML=`
+      ${aReceber>0?`<div class="iou-resumo-row positivo"><span class="iou-resumo-label">💚 A receber</span><span class="iou-resumo-val">+${fmtMoney(aReceber)}</span></div>`:''}
+      ${aPagar>0?`<div class="iou-resumo-row negativo"><span class="iou-resumo-label">❤️ A pagar</span><span class="iou-resumo-val">-${fmtMoney(aPagar)}</span></div>`:''}
+      ${pendentes.length>0?`<div class="iou-resumo-row ${saldoIOU>=0?'positivo':'negativo'}">
+        <span class="iou-resumo-label">⚖️ Saldo líquido</span>
+        <span class="iou-resumo-val">${saldoIOU>=0?'+':''}${fmtMoney(saldoIOU)}</span>
+      </div>`:''}`;
+  } else if(resumoEl){resumoEl.style.display='none';}
+
+  /* Lista — pendentes primeiro, liquidados por baixo */
+  const ordenados=[...iouList].sort((a,b)=>{
+    if(a.liquidado!==b.liquidado)return a.liquidado?1:-1;
+    return b.ts-a.ts;
+  });
+
+  el.innerHTML=ordenados.map(i=>{
+    const aReceber=i.tipo==='dei';
+    const cls=i.liquidado?'liquidado':aReceber?'a-receber':'a-pagar';
+    const sinal=aReceber?'+':'-';
+    const label=aReceber?`${DOMPurify.sanitize(i.pessoa)} deve-te`:`Deves a ${DOMPurify.sanitize(i.pessoa)}`;
+    return`<div class="iou-card ${cls}">
+      <div style="font-size:1.4rem;flex-shrink:0;">${aReceber?'💚':'❤️'}</div>
+      <div class="iou-info">
+        <div class="iou-desc">${DOMPurify.sanitize(i.descricao)}</div>
+        <div class="iou-detalhe">${label} · ${fmtDate(i.data)}${i.notas?' · '+DOMPurify.sanitize(i.notas):''}</div>
+        ${i.liquidado?'<div style="font-size:.68rem;color:var(--success);font-weight:700;">✅ Liquidado</div>':''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;">
+        <div class="iou-valor ${i.liquidado?'':aReceber?'a-receber':'a-pagar'}">${sinal}${fmtMoney(i.valor)}</div>
+        ${!i.liquidado?`<button class="liquidar-btn" onclick="liquidarIOU('${i.id}')">✅ Liquidado</button>`:''}
+        <button class="del-btn" onclick="apagarItem('${i.id}','iou')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+/* ══ SUBSCRIÇÕES ══ */
+const colSubscricoes=col("subscricoes");
+let subscricoes=[];
+
+document.getElementById('btn-salvar-subscricao').onclick=async()=>{
+  const nome=DOMPurify.sanitize(document.getElementById('sub-nome').value.trim());
+  const emoji=document.getElementById('sub-emoji').value.trim()||'🔄';
+  const valor=parseFloat(document.getElementById('sub-valor').value);
+  const dia=parseInt(document.getElementById('sub-dia').value)||1;
+  const periodicidade=document.getElementById('sub-periodicidade').value;
+  const categoria=document.getElementById('sub-categoria').value;
+  if(!nome||!valor||valor<=0)return toast("Preenche o nome e o valor!","error");
+  await addDoc(colSubscricoes,{nome,emoji,valor,dia,periodicidade,categoria,uid,ts:Date.now()});
+  fecharModal('modal-add-subscricao');
+  ['sub-nome','sub-emoji','sub-valor','sub-dia'].forEach(id=>document.getElementById(id).value='');
+  toast("Subscrição adicionada! 🔄");
+  agendarNotificacoesSubscricoes();
+};
+
+function agendarNotificacoesSubscricoes(){
+  const hoje=new Date();
+  const diaHoje=hoje.getDate();
+  subscricoes.forEach(s=>{
+    if(s.periodicidade==='mensal'&&s.dia){
+      const diasAte=s.dia-diaHoje;
+      if(diasAte===3){
+        enviarNotificacao(`🔄 ${s.nome} será cobrado em 3 dias`,`Valor: ${fmtMoney(s.valor)}`);
+      } else if(diasAte===0){
+        enviarNotificacao(`💸 ${s.nome} é cobrado hoje!`,`Valor: ${fmtMoney(s.valor)}`);
+      }
+    }
+  });
+}
+
+function renderSubscricoes(){
+  const el=document.getElementById('lista-subscricoes');
+  if(!el)return;
+  if(!subscricoes.length){el.innerHTML='<div class="empty-state">Sem subscrições. Adiciona a primeira!</div>';return;}
+
+  const hoje=new Date();
+  const diaHoje=hoje.getDate();
+
+  /* Custo fixo mensal total */
+  const totalMensal=subscricoes.reduce((acc,s)=>{
+    if(s.periodicidade==='mensal')return acc+s.valor;
+    if(s.periodicidade==='anual')return acc+(s.valor/12);
+    if(s.periodicidade==='semanal')return acc+(s.valor*4.33);
+    return acc;
+  },0);
+
+  const totalEl=document.getElementById('custo-fixo-total');
+  const totalValEl=document.getElementById('custo-fixo-val');
+  if(totalEl){totalEl.style.display='flex';totalValEl.textContent=fmtMoney(totalMensal);}
+
+  const PERIOD_LABELS={mensal:'Mensal',anual:'Anual',semanal:'Semanal'};
+  const CAT_LABELS={entretenimento:'Entretenimento',saude:'Saúde & Ginásio',educacao:'Educação',tecnologia:'Tecnologia',outros:'Outros'};
+
+  el.innerHTML=subscricoes.map(s=>{
+    const diasAte=s.dia?s.dia-diaHoje:null;
+    let alertaHtml='';
+    if(diasAte!==null&&s.periodicidade==='mensal'){
+      if(diasAte===0)alertaHtml='<span class="sub-alerta urgente">💸 Cobrado hoje!</span>';
+      else if(diasAte>0&&diasAte<=3)alertaHtml=`<span class="sub-alerta">⚠️ Em ${diasAte} dia${diasAte!==1?'s':''}</span>`;
+      else if(diasAte<0){
+        const proximoMes=new Date(hoje.getFullYear(),hoje.getMonth()+1,s.dia);
+        const diasProx=Math.ceil((proximoMes-hoje)/(1000*60*60*24));
+        if(diasProx<=3)alertaHtml=`<span class="sub-alerta">⚠️ Em ${diasProx} dia${diasProx!==1?'s':''}</span>`;
+      }
+    }
+    return`<div class="sub-card">
+      <div class="sub-emoji">${s.emoji||'🔄'}</div>
+      <div class="sub-info">
+        <div class="sub-nome">${DOMPurify.sanitize(s.nome)}</div>
+        <div class="sub-detalhe">${PERIOD_LABELS[s.periodicidade]||'Mensal'} · ${CAT_LABELS[s.categoria]||'Outros'}${s.dia?' · Dia '+s.dia:''}</div>
+        ${alertaHtml}
+      </div>
+      <div style="display:flex;align-items:center;gap:.4rem;">
+        <div class="sub-valor">-${fmtMoney(s.valor)}</div>
+        <button class="del-btn" onclick="apagarItem('${s.id}','subscricoes')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+/* ══ MEALHEIROS ══ */
+const colMealheiros=col("mealheiros");
+let mealheiros=[];
+let mealheiroEmDeposito=null;
+
+document.getElementById('btn-salvar-mealheiro').onclick=async()=>{
+  const nome=DOMPurify.sanitize(document.getElementById('mealheiro-nome').value.trim());
+  const emoji=document.getElementById('mealheiro-emoji').value.trim()||'🐷';
+  const meta=parseFloat(document.getElementById('mealheiro-meta').value);
+  const atual=parseFloat(document.getElementById('mealheiro-atual').value)||0;
+  const data=document.getElementById('mealheiro-data').value;
+  if(!nome||!meta||meta<=0)return toast("Preenche o nome e a meta!","error");
+  await addDoc(colMealheiros,{nome,emoji,meta,atual,data,uid,ts:Date.now()});
+  fecharModal('modal-add-mealheiro');
+  document.getElementById('mealheiro-nome').value='';
+  document.getElementById('mealheiro-emoji').value='';
+  document.getElementById('mealheiro-meta').value='';
+  document.getElementById('mealheiro-atual').value='0';
+  document.getElementById('mealheiro-data').value='';
+  toast("Mealheiro criado! 🐷");
+};
+
+window.abrirDeposito=(m)=>{
+  mealheiroEmDeposito=m;
+  document.getElementById('modal-depositar-title').textContent=`💰 ${m.nome}`;
+  document.getElementById('modal-depositar-emoji').textContent=m.emoji||'🐷';
+  const pct=Math.min(100,Math.round(m.atual/m.meta*100));
+  document.getElementById('modal-depositar-info').textContent=`${fmtMoney(m.atual)} de ${fmtMoney(m.meta)} (${pct}%)`;
+  document.getElementById('modal-depositar-bar').style.width=pct+'%';
+  document.getElementById('depositar-valor').value='';
+  abrirModal('modal-depositar-mealheiro');
+};
+
+document.getElementById('btn-confirmar-deposito').onclick=async()=>{
+  if(!mealheiroEmDeposito)return;
+  const val=parseFloat(document.getElementById('depositar-valor').value);
+  if(!val||val<=0)return toast("Valor inválido","error");
+  const novoAtual=Math.min(mealheiroEmDeposito.meta,mealheiroEmDeposito.atual+val);
+  await updateDoc(doc(db,"mealheiros",mealheiroEmDeposito.id),{atual:novoAtual});
+  if(novoAtual>=mealheiroEmDeposito.meta){
+    confetti({particleCount:200,spread:90});
+    toast(`🎉 Meta atingida! ${mealheiroEmDeposito.nome} completo!`);
+  } else {
+    toast(`+${fmtMoney(val)} depositado! 💰`);
+  }
+  fecharModal('modal-depositar-mealheiro');
+};
+
+function renderMealheiros(){
+  const el=document.getElementById('lista-mealheiros');
+  if(!el)return;
+  if(!mealheiros.length){el.innerHTML='<div class="empty-state">Sem mealheiros. Cria o primeiro!</div>';return;}
+  const hoje=new Date();
+  el.innerHTML=mealheiros.map(m=>{
+    const pct=Math.min(100,Math.round(m.atual/m.meta*100));
+    const cls=pct>=100?'green':pct>=60?'blue':'orange';
+    const concluido=m.atual>=m.meta;
+    /* Cálculo mensal */
+    let mensalHtml='';
+    if(m.data&&!concluido){
+      const prazo=new Date(m.data);
+      const mesesRestantes=Math.max(1,Math.ceil((prazo-hoje)/(1000*60*60*24*30)));
+      const falta=m.meta-m.atual;
+      const porMes=falta/mesesRestantes;
+      const urgente=mesesRestantes<=2;
+      mensalHtml=`<div class="mealheiro-prazo ${urgente?'urgente':''}">📅 ${mesesRestantes} mes${mesesRestantes!==1?'es':''} restante${mesesRestantes!==1?'s':''}</div>
+      <div class="mealheiro-mensal">💡 Poupar ${fmtMoney(porMes)}/mês</div>`;
+    }
+    return`<div class="mealheiro-card">
+      <div class="mealheiro-header">
+        <div class="mealheiro-emoji">${m.emoji||'🐷'}</div>
+        <div class="mealheiro-info">
+          <div class="mealheiro-nome">${DOMPurify.sanitize(m.nome)}${concluido?' ✅':''}</div>
+          <div class="mealheiro-vals">${fmtMoney(m.atual)} / <span class="mealheiro-meta-val">${fmtMoney(m.meta)}</span></div>
+        </div>
+        <div style="display:flex;gap:.4rem;">
+          ${!concluido?`<button class="btn-secondary" style="padding:.4rem .7rem;font-size:.78rem;" onclick="abrirDeposito(${JSON.stringify(m).replace(/"/g,'&quot;')})">+ Depositar</button>`:''}
+          <button class="del-btn" onclick="apagarItem('${m.id}','mealheiros')">✕</button>
+        </div>
+      </div>
+      <div class="progress-bar-track" style="height:8px;">
+        <div class="progress-bar-fill ${cls}" style="width:${pct}%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.3rem;">
+        <div style="font-size:.72rem;color:var(--muted);">${pct}% concluído</div>
+        ${mensalHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
 /* Orçamentos */
 document.getElementById('btn-salvar-budget').onclick=()=>{
   const cat=document.getElementById('budget-cat').value;
@@ -1829,7 +2495,6 @@ function renderFlashcards(){
   if(document.getElementById('view-flashcards')?.classList.contains('active'))renderStudyArea();
 }
 
-/* ══ RENDER PRINCIPAL ══ */
 function renderizarApp(){
   try{
     const hoje=getHoje();
@@ -1842,6 +2507,10 @@ function renderizarApp(){
     renderFlashcards();
     renderAgenda(hoje,search);
     if(tabNotaAtiva==='academicas')renderNotasAcademicas();
+    renderIOU();
+    if(document.getElementById('modal-pomo-estudo')?.classList.contains('open'))renderPomoFC();
+    renderSubscricoes();
+    renderMealheiros();
     verificarStreakDiario();
     /* Saldo dashboard */
     let s=0;financas.forEach(f=>f.tipo==='entrada'?s+=f.valor:s-=f.valor);
@@ -1865,6 +2534,9 @@ function initDB(){
   unsubs.push(onSnapshot(q(colObjProg),s=>{objProg=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);agendarRender();}));
   unsubs.push(onSnapshot(q(colFC),s=>{flashcards=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);agendarRender();}));
   unsubs.push(onSnapshot(q(colNA),s=>{notasAcademicas=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);agendarRender();}));
+  unsubs.push(onSnapshot(query(colIOU,where("uid","==",uid)),s=>{iouList=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);agendarRender();}));
+unsubs.push(onSnapshot(query(colSubscricoes,where("uid","==",uid)),s=>{subscricoes=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);agendarRender();}));
+unsubs.push(onSnapshot(query(colMealheiros,where("uid","==",uid)),s=>{mealheiros=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);agendarRender();}));
 }
 </script>
 </body>
