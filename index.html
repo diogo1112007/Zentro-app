@@ -191,6 +191,9 @@ body.zen-mode .zen-banner{display:flex;}
 .fin-amount.entrada{color:var(--success);}.fin-amount.saida{color:var(--danger);}
 .fin-form{display:flex;flex-direction:column;gap:.7rem;}
 .chart-wrap{height:200px;position:relative;}
+/* Calculadora */
+#calc-resultados{display:flex;flex-direction:column;gap:.5rem;}
+
 /* Orçamentos */
 .budget-row{display:flex;flex-direction:column;gap:.3rem;padding:.75rem 1rem;background:var(--surface2);border-radius:var(--r-md);}
 .budget-header{display:flex;align-items:center;justify-content:space-between;}
@@ -767,6 +770,14 @@ select{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/
       <div class="metric-card"><div class="metric-label">Gastos</div><div class="metric-value red" id="dash-gastos">0,00€</div></div>
     </div>
     <div class="card"><div class="card-title">Gastos por Categoria</div><div class="chart-wrap"><canvas id="finance-chart"></canvas></div></div>
+    <div class="card" id="calculadora-card">
+      <div class="card-title">🧮 Calculadora Financeira</div>
+      <div class="form-group">
+        <label class="form-label" for="calc-salario">O teu salário mensal (€)</label>
+        <input type="number" id="calc-salario" placeholder="Ex: 1200" min="0" step="0.01" oninput="calcularFinancas()">
+      </div>
+      <div id="calc-resultados" style="display:none;margin-top:.75rem;display:flex;flex-direction:column;gap:.5rem;"></div>
+    </div>
     <div class="card" id="budgets-card">
       <div class="card-title">Orçamentos Mensais</div>
       <div id="lista-budgets"></div>
@@ -1245,7 +1256,7 @@ let tagFiltroAtivo=null;
 
 /* Cores por dia — localStorage */
 const DIA_CORES_KEY=()=>`dia_cores_${uid}`;
-let diaCores={Seg:'',Ter:'',Qua:'',Qui:'',Sex:''};
+let diaCores={Seg:'',Ter:'',Qua:'',Qui:'',Sex:'',Sáb:'',Dom:''};
 function carregarDiaCores(){try{const s=localStorage.getItem(DIA_CORES_KEY());if(s)diaCores={...diaCores,...JSON.parse(s)};}catch(e){}}
 function guardarDiaCores(){localStorage.setItem(DIA_CORES_KEY(),JSON.stringify(diaCores));}
 
@@ -1273,8 +1284,8 @@ const fmtMoney=v=>v.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFract
 const MESES=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const DIAS_SEMANA=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
 const MOOD_EMOJI={1:'😞',2:'😕',3:'😐',4:'🙂',5:'😄'};
-const DIAS_HOR=['Seg','Ter','Qua','Qui','Sex'];
-const HORAS_HOR=['08:00','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','14:00','15:00','16:00','17:00','18:00','18:30','19:00','20:00'];
+const DIAS_HOR=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+const HORAS_HOR=['06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'];
 
 /* Cores disciplinas */
 const DISC_PALETTE=['#2563eb','#059669','#d97706','#7c3aed','#dc2626','#0891b2','#be185d','#15803d','#b45309','#4338ca'];
@@ -1602,7 +1613,7 @@ window.mudarTabNota=(tab,btn)=>{
   atualizarFAB(viewAtual);
   if(tab==='academicas')renderNotasAcademicas();
   if(tab==='normais')renderizarApp();
-  if(tab==='privadas'&&cofreDesbloqueado)renderNotas('');
+  if(tab==='privadas'){if(cofreDesbloqueado){document.getElementById('cofre-content').style.display='block';renderNotas('');}else{document.getElementById('cofre-content').style.display='none';}}
 };
 
 /* PIN — cofre privado */
@@ -1617,7 +1628,7 @@ function confirmarPIN(){
   else if(pinBuffer===saved){cofreDesbloqueado=true;fecharModal('modal-pin');document.getElementById('cofre-status').textContent='Desbloqueado 🔓';document.getElementById('cofre-content').style.display='block';toast('Cofre desbloqueado 🔓');if(pinResolve){pinResolve();pinResolve=null;}}
   else{document.getElementById('pin-error').style.display='block';pinBuffer='';renderPinDots();}
 }
-document.getElementById('btn-abrir-cofre').onclick=()=>{if(cofreDesbloqueado){document.getElementById('cofre-content').style.display='block';}else{pedirPIN(()=>{document.getElementById('cofre-content').style.display='block';renderNotas('');});}};
+document.getElementById('btn-abrir-cofre').onclick=()=>{if(cofreDesbloqueado){document.getElementById('cofre-content').style.display='block';renderNotas('');}else{pedirPIN(()=>{document.getElementById('cofre-content').style.display='block';renderNotas('');});}};
 
 /* Notas académicas */
 document.getElementById('btn-salvar-nota-academica').onclick=async()=>{
@@ -2307,6 +2318,8 @@ function renderFinancas(){
   document.getElementById('dash-saldo').textContent=fmtMoney(saldo);
   const dg=document.getElementById('dash-ganhos'),dgs=document.getElementById('dash-gastos');
   if(dg)dg.textContent=fmtMoney(ganhos);if(dgs)dgs.textContent=fmtMoney(gastos);
+  const dsf=document.getElementById('dash-saldo-fin');if(dsf){dsf.textContent=fmtMoney(saldo);dsf.className=`metric-value ${saldo>=0?'green':'red'}`;}
+  const dp=document.getElementById('dash-poupanca');if(dp)dp.textContent=fmtMoney(Math.max(0,ganhos-gastos));
 
   if(document.getElementById('view-financas')?.classList.contains('active')){
     const canvas=document.getElementById('finance-chart');
@@ -2414,7 +2427,7 @@ function renderNotas(search){
   /* ── Notas privadas — lidas do Firebase (campo privada:true) ── */
   const elNotP=document.getElementById('lista-notas-privadas');
   if(elNotP){
-    if(!cofreDesbloqueado){return;}
+    if(!cofreDesbloqueado){elNotP.innerHTML='';return;}
     const priv=notas.filter(n=>n.privada===true);
     elNotP.innerHTML='';
     if(!priv.length){elNotP.innerHTML='<div class="empty-state" style="grid-column:1/-1;">Sem notas privadas. Adiciona a primeira!</div>';}
@@ -2432,6 +2445,39 @@ function renderNotas(search){
 }
 
 window.filtrarPorTag=(tag)=>{tagFiltroAtivo=tag;renderizarApp();};
+
+window.calcularFinancas=()=>{
+  const sal=parseFloat(document.getElementById('calc-salario').value)||0;
+  const el=document.getElementById('calc-resultados');
+  if(!sal||sal<=0){el.style.display='none';return;}
+  el.style.display='flex';
+  const rows=[
+    {icon:'🏦',label:'Capital a investir (100×)',desc:'Para receber o teu salário sem trabalhar',val:sal*100,cor:'var(--accent)'},
+    {icon:'📈',label:'Poupança mensal recomendada (20%)',desc:'Para atingires independência financeira',val:sal*0.2,cor:'var(--success)'},
+    {icon:'🛡️',label:'Fundo de emergência (6× salário)',desc:'Reserva em renda fixa para segurança',val:sal*6,cor:'var(--warn)'},
+    {icon:'🏠',label:'Prestação máxima empréstimo (30%)',desc:'Valor máximo seguro de crédito mensal',val:sal*0.3,cor:'var(--danger)'},
+    {icon:'📋',label:'Máximo em rendas fixas (50%)',desc:'Limite para despesas fixas mensais',val:sal*0.5,cor:'var(--purple)'},
+  ];
+  el.innerHTML=rows.map(r=>`
+    <div style="background:var(--surface2);border-radius:var(--r-md);padding:.75rem 1rem;border-left:3px solid ${r.cor};">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:.82rem;font-weight:700;">${r.icon} ${r.label}</div>
+          <div style="font-size:.7rem;color:var(--muted);margin-top:2px;">${r.desc}</div>
+        </div>
+        <div style="font-size:1rem;font-weight:800;font-family:var(--mono);color:${r.cor};flex-shrink:0;margin-left:.5rem;">${r.val.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})}€</div>
+      </div>
+    </div>`).join('');
+};
+
+window.copiarNota=async(titulo,conteudo,e)=>{
+  e.stopPropagation();
+  const texto=titulo+(conteudo?'
+
+'+conteudo.replace(/<[^>]*>/g,''):'');
+  try{await navigator.clipboard.writeText(texto);toast('📋 Nota copiada!');}
+  catch(err){toast('Erro ao copiar','error');}
+};
 
 function renderNotasAcademicas(){
   const el=document.getElementById('lista-disciplinas');if(!el)return;
