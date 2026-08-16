@@ -238,6 +238,10 @@ body.zen-mode .zen-banner{display:flex;}
 .note-del:hover{background:rgba(220,38,38,.3);color:#7f0000;transform:scale(1.2);}
 [data-theme="dark"] .note-del{color:white;background:rgba(0,0,0,.35);}
 [data-theme="dark"] .note-del:hover{background:rgba(220,38,38,.5);color:white;}
+.note-copy{position:absolute;bottom:6px;right:34px;width:24px;height:24px;border-radius:6px;background:rgba(0,0,0,.15);border:none;cursor:pointer;font-size:.8rem;color:#111;display:flex;align-items:center;justify-content:center;transition:transform .18s var(--ease-bounce),background .15s;}
+.note-copy:hover{background:rgba(37,99,235,.3);transform:scale(1.2);}
+[data-theme="dark"] .note-copy{color:white;background:rgba(0,0,0,.35);}
+[data-theme="dark"] .note-copy:hover{background:rgba(37,99,235,.5);}
 .note-locked{position:absolute;top:8px;right:8px;font-size:.9rem;}
 .note-card.locked-card{border:2px solid var(--purple);}
 .notes-tabs{display:flex;gap:.4rem;margin-bottom:.75rem;}
@@ -2419,8 +2423,8 @@ function renderNotas(search){
         div.className='note-card';
         div.style.backgroundColor=n.cor||'#ffffff';
         div.style.border='1px solid rgba(0,0,0,.08)';
-        const tagsHtml=(n.tags||[]).length?`<div class="note-tags">${(n.tags||[]).map(t=>`<span class="note-tag">${t}</span>`).join('')}</div>`:'';
-        div.innerHTML=`<div class="note-title">${DOMPurify.sanitize(n.titulo)||'Sem título'}</div><div class="note-preview">${DOMPurify.sanitize(n.conteudo,{ALLOWED_TAGS:[]})}</div>${tagsHtml}<button class="note-del" onclick="event.stopPropagation();apagarItem('${n.id}','notas')">✕</button>`;
+        const tagsHdiv.innerHTML=`<div class="note-title">${DOMPurify.sanitize(n.titulo)||'Sem título'}</div><div class="note-preview">${DOMPurify.sanitize(n.conteudo,{ALLOWED_TAGS:[]})}</div>${tagsHtml}<button class="note-copy" onclick="copiarNota('${n.id}', event)" title="Copiar">📋</button><button class="note-del" onclick="event.stopPropagation();apagarItem('${n.id}','notas')">✕</button>`;tml=(n.tags||[]).length?`<div class="note-tags">${(n.tags||[]).map(t=>`<span class="note-tag">${t}</span>`).join('')}</div>`:'';
+        
         div.onclick=()=>abrirModalNota(n);
         elNot.appendChild(div);
       });
@@ -2439,7 +2443,7 @@ function renderNotas(search){
         const div=document.createElement('div');
         div.className='note-card locked-card';
         div.style.backgroundColor=n.cor||'#ffffff';
-        div.innerHTML=`<div class="note-title">${DOMPurify.sanitize(n.titulo)||'Sem título'}</div><div class="note-preview">${DOMPurify.sanitize(n.conteudo,{ALLOWED_TAGS:[]})}</div><span class="note-locked">🔒</span><button class="note-del" onclick="event.stopPropagation();apagarItem('${n.id}','notas')">✕</button>`;
+        div.innerHTML=`<div class="note-title">${DOMPurify.sanitize(n.titulo)||'Sem título'}</div><div class="note-preview">${DOMPurify.sanitize(n.conteudo,{ALLOWED_TAGS:[]})}</div><span class="note-locked">🔒</span><button class="note-copy" onclick="copiarNota('${n.id}', event)" title="Copiar">📋</button><button class="note-del" onclick="event.stopPropagation();apagarItem('${n.id}','notas')">✕</button>`;
         div.onclick=()=>abrirModalNota(n,true);
         elNotP.appendChild(div);
       });
@@ -2473,9 +2477,11 @@ window.calcularFinancas=()=>{
     </div>`).join('');
 };
 
-window.copiarNota=async(titulo,conteudo,e)=>{
+window.copiarNota=async(id,e)=>{
   e.stopPropagation();
-  const texto=titulo+(conteudo?'\n\n'+conteudo.replace(/<[^>]*>/g,''):'');
+  const n = notas.find(x => x.id === id);
+  if(!n) return;
+  const texto=n.titulo+(n.conteudo?'\n\n'+n.conteudo.replace(/<[^>]*>/g,''):'');
   try{await navigator.clipboard.writeText(texto);toast('📋 Nota copiada!');}
   catch(err){toast('Erro ao copiar','error');}
 };
