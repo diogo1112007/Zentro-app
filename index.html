@@ -2423,8 +2423,8 @@ function renderNotas(search){
         div.className='note-card';
         div.style.backgroundColor=n.cor||'#ffffff';
         div.style.border='1px solid rgba(0,0,0,.08)';
-        const tagsHdiv.innerHTML=`<div class="note-title">${DOMPurify.sanitize(n.titulo)||'Sem título'}</div><div class="note-preview">${DOMPurify.sanitize(n.conteudo,{ALLOWED_TAGS:[]})}</div>${tagsHtml}<button class="note-copy" onclick="copiarNota('${n.id}', event)" title="Copiar">📋</button><button class="note-del" onclick="event.stopPropagation();apagarItem('${n.id}','notas')">✕</button>`;tml=(n.tags||[]).length?`<div class="note-tags">${(n.tags||[]).map(t=>`<span class="note-tag">${t}</span>`).join('')}</div>`:'';
-        
+        const tagsHtml=(n.tags||[]).length?`<div class="note-tags">${(n.tags||[]).map(t=>`<span class="note-tag">${t}</span>`).join('')}</div>`:'';
+        div.innerHTML=`<div class="note-title">${DOMPurify.sanitize(n.titulo)||'Sem título'}</div><div class="note-preview">${DOMPurify.sanitize(n.conteudo,{ALLOWED_TAGS:[]})}</div>${tagsHtml}<button class="note-copy" onclick="copiarNota('${n.id}', event)" title="Copiar">📋</button><button class="note-del" onclick="event.stopPropagation();apagarItem('${n.id}','notas')">✕</button>`;
         div.onclick=()=>abrirModalNota(n);
         elNot.appendChild(div);
       });
