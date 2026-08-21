@@ -1095,19 +1095,24 @@ select{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/
       <input type="text" id="iou-descricao" placeholder="Ex: Jantar, Bilhetes, Material…">
     </div>
     <div class="form-group">
-      <label class="form-label" for="iou-valor">Valor total (€)</label>
-      <input type="number" id="iou-valor" min="0.01" step="0.01" placeholder="Ex: 45.00">
+      <label class="form-label" for="iou-valor">Valor total da despesa (€)</label>
+      <input type="number" id="iou-valor" min="0.01" step="0.01" placeholder="Ex: 45.00" oninput="atualizarPreviewIOU()">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="iou-divisao">A dividir por quantas pessoas? (Total)</label>
+      <input type="number" id="iou-divisao" min="1" value="1" placeholder="Ex: 3" oninput="atualizarPreviewIOU()">
+      <div style="font-size: 0.75rem; color: var(--accent); margin-top: 4px; font-weight: 700;" id="iou-preview-calc">Valor por pessoa: 0,00€</div>
     </div>
     <div class="form-group">
       <label class="form-label" for="iou-tipo">Direção</label>
       <select id="iou-tipo">
-        <option value="dei">💸 Eu paguei — alguém me deve</option>
-        <option value="recebi">🤲 Alguém pagou — eu devo</option>
+        <option value="dei">💸 Eu paguei — eles devem-me</option>
+        <option value="recebi">🤲 Eles pagaram — eu devo</option>
       </select>
     </div>
     <div class="form-group">
-      <label class="form-label" for="iou-pessoa">Nome da pessoa</label>
-      <input type="text" id="iou-pessoa" placeholder="Ex: João, Ana, Malta do curso…">
+      <label class="form-label" for="iou-pessoa">Nomes (separados por vírgula)</label>
+      <input type="text" id="iou-pessoa" placeholder="Ex: João, Ana, Miguel">
     </div>
     <div class="form-group">
       <label class="form-label" for="iou-data">Data</label>
@@ -1854,18 +1859,40 @@ window.responderSREstudo=async(dificuldade)=>{
 const colIOU=col("iou");
 let iouList=[];
 
+/* Mostra o valor calculado em tempo real */
+window.atualizarPreviewIOU = () => {
+  const valor = parseFloat(document.getElementById('iou-valor').value) || 0;
+  const divisao = parseInt(document.getElementById('iou-divisao').value) || 1;
+  const calc = (valor / divisao).toLocaleString('pt-PT', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('iou-preview-calc').textContent = `Valor por pessoa: ${calc}€`;
+};
+
+/* Gravar e dividir a conta */
 document.getElementById('btn-salvar-iou').onclick=async()=>{
   const descricao=DOMPurify.sanitize(document.getElementById('iou-descricao').value.trim());
-  const valor=parseFloat(document.getElementById('iou-valor').value);
+  const valorTotal=parseFloat(document.getElementById('iou-valor').value);
+  const divisao=parseInt(document.getElementById('iou-divisao').value)||1;
   const tipo=document.getElementById('iou-tipo').value;
-  const pessoa=DOMPurify.sanitize(document.getElementById('iou-pessoa').value.trim());
+  const pessoasInput=DOMPurify.sanitize(document.getElementById('iou-pessoa').value.trim());
   const data=document.getElementById('iou-data').value||getHoje();
   const notas=DOMPurify.sanitize(document.getElementById('iou-notas').value.trim());
-  if(!descricao||!valor||valor<=0||!pessoa)return toast("Preenche todos os campos obrigatórios!","error");
-  await addDoc(colIOU,{descricao,valor,tipo,pessoa,data,notas,liquidado:false,uid,ts:Date.now()});
+  
+  if(!descricao||!valorTotal||valorTotal<=0||!pessoasInput)return toast("Preenche todos os campos obrigatórios!","error");
+  
+  const valorPorPessoa = valorTotal / divisao;
+  const nomes = pessoasInput.split(',').map(n => n.trim()).filter(n => n !== "");
+  
+  if(nomes.length === 0) return toast("Preenche pelo menos um nome!","error");
+
+  for(const nome of nomes) {
+    await addDoc(colIOU,{descricao,valor:valorPorPessoa,tipo,pessoa:nome,data,notas,liquidado:false,uid,ts:Date.now()});
+  }
+
   fecharModal('modal-add-iou');
   ['iou-descricao','iou-valor','iou-pessoa','iou-notas'].forEach(id=>document.getElementById(id).value='');
-  toast("Despesa registada! 🤝");
+  document.getElementById('iou-divisao').value = '1';
+  atualizarPreviewIOU();
+  toast(nomes.length > 1 ? `${nomes.length} dívidas registadas! 🤝` : "Despesa registada! 🤝");
 };
 
 window.liquidarIOU=async(id)=>{
