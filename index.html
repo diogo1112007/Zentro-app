@@ -226,14 +226,23 @@ body.zen-mode .zen-banner{display:flex;}
 .notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
 .note-card{border-radius:var(--r-md);padding:1rem;cursor:pointer;height:150px;overflow:hidden;position:relative;transition:transform .2s var(--ease-bounce),box-shadow .2s;}
 .note-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:var(--shadow-lg);}
-/* Light mode: usa a cor de fundo directamente */
+
+/* Película de vidro para o Modo Escuro não ofuscar */
+.note-card::before {content:'';position:absolute;inset:0;background:transparent;transition:background .3s;pointer-events:none;z-index:0;}
+[data-theme="dark"] .note-card::before {background:rgba(17, 16, 24, 0.75);}
+
+/* Elevar o texto para cima da película */
+.note-card > * {position:relative;z-index:1;}
+
+/* Cores do texto */
 .note-card .note-title{font-size:.88rem;font-weight:700;margin-bottom:.4rem;color:#1a1a1a;}
 .note-card .note-preview{font-size:.75rem;color:#3a3a3a;opacity:.9;overflow:hidden;max-height:70px;line-height:1.4;}
-/* Dark mode: inverte levemente a cor e garante contraste */
-[data-theme="dark"] .note-card{filter:brightness(.75) saturate(1.3);}
-[data-theme="dark"] .note-card .note-title{color:#ffffff !important;text-shadow:0 1px 3px rgba(0,0,0,.6);}
-[data-theme="dark"] .note-card .note-preview{color:#f0f0f0 !important;opacity:.95;text-shadow:0 1px 2px rgba(0,0,0,.5);}
-[data-theme="dark"] .note-card.locked-card{filter:brightness(.7) saturate(1.2);}
+
+/* Dark mode: Texto 100% brilhante sem filtros que estragam a leitura */
+[data-theme="dark"] .note-card{filter:none;border:1px solid var(--border);}
+[data-theme="dark"] .note-card .note-title{color:#ffffff !important;text-shadow:none;}
+[data-theme="dark"] .note-card .note-preview{color:#e5e7eb !important;opacity:1;text-shadow:none;}
+[data-theme="dark"] .note-card.locked-card{border:2px solid var(--purple);}
 .note-del{position:absolute;bottom:6px;right:6px;width:24px;height:24px;border-radius:6px;background:rgba(0,0,0,.15);border:none;cursor:pointer;font-size:.8rem;color:#111;display:flex;align-items:center;justify-content:center;transition:transform .18s var(--ease-bounce),background .15s;}
 .note-del:hover{background:rgba(220,38,38,.3);color:#7f0000;transform:scale(1.2);}
 [data-theme="dark"] .note-del{color:white;background:rgba(0,0,0,.35);}
