@@ -2429,8 +2429,35 @@ function renderHabitos(hoje){
     }
   }
   if(document.getElementById('view-habitos')?.classList.contains('active')){
-    const sc=document.getElementById('stats-chart');
-    if(sc){if(statsChart)statsChart.destroy();const labels=[],data=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const s=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;labels.push(DIAS_SEMANA[d.getDay()]);data.push(habitosLog.filter(l=>l.data===s).length);}statsChart=new Chart(sc,{type:'bar',data:{labels,datasets:[{label:'Check-ins',data,backgroundColor:'rgba(37,99,235,.7)',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,color:'var(--muted)'},grid:{color:'var(--border)'}},x:{ticks:{color:'var(--muted)'},grid:{display:false}}}}});}
+   const sc=document.getElementById('stats-chart');
+    if(sc){
+      if(statsChart)statsChart.destroy();
+      const labels=[],diasStr=[];
+      for(let i=6;i>=0;i--){
+        const d=new Date();d.setDate(d.getDate()-i);
+        const s=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        labels.push(DIAS_SEMANA[d.getDay()]);diasStr.push(s);
+      }
+      const coresHab=['#2563eb','#059669','#d97706','#7c3aed','#dc2626','#0891b2','#be185d','#15803d'];
+      const datasets=habitos.map((h,i)=>({
+        label:DOMPurify.sanitize(h.nome),
+        data:diasStr.map(dia=>habitosLog.some(l=>l.habitoId===h.id&&l.data===dia)?1:0),
+        backgroundColor:coresHab[i%coresHab.length],
+        borderRadius:4
+      }));
+      statsChart=new Chart(sc,{
+        type:'bar',
+        data:{labels,datasets},
+        options:{
+          responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:true,position:'bottom',labels:{color:'var(--muted)',boxWidth:12,font:{family:'Sora',size:10}}}},
+          scales:{
+            y:{stacked:true,beginAtZero:true,ticks:{stepSize:1,color:'var(--muted)'},grid:{color:'var(--border)'}},
+            x:{stacked:true,ticks:{color:'var(--muted)'},grid:{display:false}}
+          }
+        }
+      });
+    }
     const mc=document.getElementById('mood-chart');
     if(mc){if(moodChart)moodChart.destroy();const ml=[],md=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const s=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;ml.push(DIAS_SEMANA[d.getDay()]);const entry=moodLog.find(m=>m.data===s);md.push(entry?entry.mood:null);}moodChart=new Chart(mc,{type:'line',data:{labels:ml,datasets:[{label:'Humor',data:md,borderColor:'var(--accent)',backgroundColor:'var(--accent-bg)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'var(--accent)',tension:.3,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:1,max:5,ticks:{stepSize:1,color:'var(--muted)',callback:v=>MOOD_EMOJI[v]||v},grid:{color:'var(--border)'}},x:{ticks:{color:'var(--muted)'},grid:{display:false}}}}});}
   }
