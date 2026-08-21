@@ -749,6 +749,10 @@ select{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/
 
   <!-- FINANÇAS -->
   <section id="view-financas" class="view-section">
+    <div class="metrics-row">
+      <div class="metric-card"><div class="metric-label">Ganhos</div><div class="metric-value green" id="dash-ganhos">0,00€</div></div>
+      <div class="metric-card"><div class="metric-label">Gastos</div><div class="metric-value red" id="dash-gastos">0,00€</div></div>
+    </div>
     <!-- MEALHEIROS -->
      <!-- IOU -->
 <div class="card" id="iou-card">
@@ -778,10 +782,6 @@ select{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/
   </div>
   <div id="lista-mealheiros"></div>
 </div>
-    <div class="metrics-row">
-      <div class="metric-card"><div class="metric-label">Ganhos</div><div class="metric-value green" id="dash-ganhos">0,00€</div></div>
-      <div class="metric-card"><div class="metric-label">Gastos</div><div class="metric-value red" id="dash-gastos">0,00€</div></div>
-    </div>
     <div class="card"><div class="card-title">Gastos por Categoria</div><div class="chart-wrap"><canvas id="finance-chart"></canvas></div></div>
     <div class="card" id="calculadora-card">
       <div class="card-title">🧮 Calculadora Financeira</div>
