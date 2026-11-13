@@ -1,0 +1,17 @@
+rules_version = '2';
+// IMPORTANTE: publica estas regras na consola do Firebase (Firestore → Regras).
+// Sem elas, qualquer pessoa com a apiKey (que é pública) pode ler os dados de TODOS os utilizadores.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{colecao}/{docId} {
+      allow read, delete: if request.auth != null
+                          && resource.data.uid == request.auth.uid;
+      allow create:       if request.auth != null
+                          && request.resource.data.uid == request.auth.uid
+                          && request.resource.size() < 1000000;
+      allow update:       if request.auth != null
+                          && resource.data.uid == request.auth.uid
+                          && request.resource.data.uid == request.auth.uid;
+    }
+  }
+}

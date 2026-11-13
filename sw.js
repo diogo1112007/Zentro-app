@@ -1,21 +1,33 @@
-const CACHE_NAME = 'foco-app-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icone.png'
-];
+/* Foco — service worker: funciona offline e abre instantaneamente */
+const VERSION = 'foco-v2.0.1';
+const SHELL = ['./', 'index.html', 'app.css', 'app.js', 'store.js',
+  'chart.min.js', 'purify.min.js', 'confetti.js',
+  'manifest.json', 'icon-192.png', 'icon-512.png'];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-  );
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
-  );
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+});
+self.addEventListener('fetch', e => {
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  // Firebase/Google APIs: sempre rede (o Firestore já tem cache próprio)
+  if (/googleapis|firebase|gstatic\.com\/firebasejs|identitytoolkit|securetoken/.test(url.href) && !url.href.includes('fonts.')) return;
+  // Navegação: rede primeiro, cache se offline
+  if (req.mode === 'navigate') {
+    e.respondWith(fetch(req).then(r => { const cp = r.clone(); caches.open(VERSION).then(c => c.put('index.html', cp)); return r; }).catch(() => caches.match('index.html')));
+    return;
+  }
+  // Restante (CSS/JS/fontes/ícones): cache primeiro, atualiza em segundo plano
+  e.respondWith(caches.match(req).then(hit => {
+    const net = fetch(req).then(r => { if (r.ok || r.type === 'opaque') { const cp = r.clone(); caches.open(VERSION).then(c => c.put(req, cp)); } return r; }).catch(() => hit);
+    return hit || net;
+  }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window' }).then(cs => cs.length ? cs[0].focus() : self.clients.openWindow('./')));
 });
